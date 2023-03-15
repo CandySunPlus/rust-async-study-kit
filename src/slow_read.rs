@@ -1,18 +1,13 @@
+use std::io::Result;
+use std::marker::PhantomPinned;
+use std::pin::Pin;
+use std::task::{Context, Poll};
+use std::time::{Duration, Instant};
+use std::{fmt, mem, ptr, thread};
+
 use async_fs::File;
 use async_io::Timer;
-
 use futures::{AsyncRead, AsyncReadExt, FutureExt};
-use std::{
-    fmt,
-    io::Result,
-    marker::PhantomPinned,
-    mem,
-    pin::Pin,
-    ptr,
-    task::{Context, Poll},
-    thread,
-    time::{Duration, Instant},
-};
 
 fn block_on(f: impl std::future::Future + Sync + Send + 'static) {
     let complete = std::sync::Arc::new(std::sync::Mutex::new(core::sync::atomic::AtomicBool::new(

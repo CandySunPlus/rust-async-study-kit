@@ -18,3 +18,7 @@ build-slow-read = ["futures", "async-io", "async-fs", "executor"]
 name = "slow_read"
 path = "src/slow_read.rs"
 required-features = ["build-slow-read"]
+
+[[bin]]
+name = "custom_async"
+path = "src/custom_async/main.rs"
