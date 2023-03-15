@@ -21,7 +21,7 @@ pub(crate) struct Reactor {
 }
 
 impl Reactor {
-    fn new() -> Arc<Mutex<Box<Self>>> {
+    pub(crate) fn new() -> Arc<Mutex<Box<Self>>> {
         let (tx, rx) = channel::<Event>();
         let reactor = Arc::new(Mutex::new(Box::new(Reactor {
             dispatcher: tx,
@@ -89,10 +89,7 @@ impl Reactor {
     pub(crate) fn is_ready(&self, id: usize) -> bool {
         self.tasks
             .get(&id)
-            .map(|t| match t {
-                TaskState::Ready => true,
-                _ => false,
-            })
+            .map(|t| matches!(t, TaskState::Ready))
             .unwrap_or(false)
     }
 }

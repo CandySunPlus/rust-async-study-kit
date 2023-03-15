@@ -1,6 +1,11 @@
 use std::future::Future;
-use std::sync::{Condvar, Mutex};
+use std::pin::Pin;
+use std::sync::{Arc, Condvar, Mutex};
+use std::task::Context;
 
+use crate::future::{mywaker_into_waker, MyWaker};
+
+#[derive(Default)]
 pub(crate) struct Parker(Mutex<bool>, Condvar);
 
 impl Parker {
@@ -23,6 +28,22 @@ impl Parker {
     }
 }
 
-fn block_on<F: Future>(mut future: F) -> F::Output {
-    todo!()
+pub(crate) fn block_on<F: Future>(mut future: F) -> F::Output {
+    let parker = Arc::new(Parker::default());
+    let mywaker = Arc::new(MyWaker {
+        parker: parker.clone(),
+    });
+    let waker = mywaker_into_waker(Arc::into_raw(mywaker));
+    let mut cx = Context::from_waker(&waker);
+
+    // SAFETY: we shadow `future` so it can't be assessed again.
+    let mut future = unsafe { Pin::new_unchecked(&mut future) };
+
+    loop {
+        // we can use `as_mut()` for multiple call poll function, which consume the pinned type
+        match future.as_mut().poll(&mut cx) {
+            std::task::Poll::Ready(val) => break val,
+            std::task::Poll::Pending => parker.park(),
+        }
+    }
 }

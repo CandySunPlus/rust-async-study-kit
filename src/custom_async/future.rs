@@ -1,19 +1,20 @@
+use std::collections::hash_map::Entry;
 use std::future::Future;
+use std::mem;
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
-use std::{mem, pin, task};
 
 use crate::executor::Parker;
 use crate::reactor::Reactor;
 
 #[derive(Clone)]
-struct MyWaker {
-    parker: Arc<Parker>,
+pub(crate) struct MyWaker {
+    pub parker: Arc<Parker>,
 }
 
 #[derive(Clone)]
-struct Task {
+pub(crate) struct Task {
     id: usize,
     reactor: Arc<Mutex<Box<Reactor>>>,
     data: u64,
@@ -47,13 +48,13 @@ fn mywaker_clone(s: &MyWaker) -> RawWaker {
     RawWaker::new(Arc::into_raw(arc) as *const _, &VTABLE)
 }
 
-fn mywaker_into_waker(s: *const MyWaker) -> Waker {
+pub(crate) fn mywaker_into_waker(s: *const MyWaker) -> Waker {
     let raw_waker = RawWaker::new(s as *const _, &VTABLE);
     unsafe { Waker::from_raw(raw_waker) }
 }
 
 impl Task {
-    fn new(reactor: Arc<Mutex<Box<Reactor>>>, data: u64, id: usize) -> Self {
+    pub(crate) fn new(reactor: Arc<Mutex<Box<Reactor>>>, data: u64, id: usize) -> Self {
         Task { id, reactor, data }
     }
 }
@@ -67,12 +68,11 @@ impl Future for Task {
         if r.is_ready(self.id) {
             *r.tasks.get_mut(&self.id).unwrap() = TaskState::Finished;
             Poll::Ready(self.id)
-        } else if r.tasks.contains_key(&self.id) {
+        } else if let Entry::Occupied(mut e) = r.tasks.entry(self.id) {
             // The future has already been polled, so we need to insert a new `TaskState` and
             // release the old one to ensure that it wakes up with the latest waker in the next
             // poll.
-            r.tasks
-                .insert(self.id, TaskState::NotReady(cx.waker().clone()));
+            e.insert(TaskState::NotReady(cx.waker().clone()));
             Poll::Pending
         } else {
             r.register(self.data, cx.waker().clone(), self.id);
