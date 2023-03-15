@@ -3,7 +3,7 @@ use std::mem;
 use std::sync::mpsc::{channel, Sender};
 use std::sync::{Arc, Mutex};
 use std::task::Waker;
-use std::thread::{self, JoinHandle};
+use std::thread;
 use std::time::Duration;
 
 use crate::future::TaskState;
@@ -16,7 +16,7 @@ enum Event {
 
 pub(crate) struct Reactor {
     dispatcher: Sender<Event>,
-    handle: Option<JoinHandle<()>>,
+    handle: Option<thread::JoinHandle<()>>,
     pub tasks: HashMap<usize, TaskState>,
 }
 
