@@ -22,3 +22,8 @@ required-features = ["build-slow-read"]
 [[bin]]
 name = "custom_async"
 path = "src/custom_async/main.rs"
+
+[profile.release]
+lto = true
+strip = true
+opt-level = "z"

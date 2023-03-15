@@ -1,7 +1,7 @@
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::{Arc, Condvar, Mutex};
-use std::task::Context;
+use std::task::{Context, Poll};
 
 use crate::future::{mywaker_into_waker, MyWaker};
 
@@ -42,8 +42,8 @@ pub(crate) fn block_on<F: Future>(mut future: F) -> F::Output {
     loop {
         // we can use `as_mut()` for multiple call poll function, which consume the pinned type
         match future.as_mut().poll(&mut cx) {
-            std::task::Poll::Ready(val) => break val,
-            std::task::Poll::Pending => parker.park(),
+            Poll::Ready(val) => break val,
+            Poll::Pending => parker.park(),
         }
     }
 }
