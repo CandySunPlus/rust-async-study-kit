@@ -1,27 +1,5 @@
-[package]
-name = "async-study-kit"
-version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-futures = { version = "0.3", optional = true }
-async-io = { version = "1.12", optional = true }
-async-fs = { version = "1.6", optional = true }
-executor = { version = "0.8", optional = true }
-
-[features]
-build-slow-read = ["futures", "async-io", "async-fs", "executor"]
-
-[[bin]]
-name = "slow_read"
-path = "src/slow_read.rs"
-required-features = ["build-slow-read"]
-
-[[bin]]
-name = "custom_async"
-path = "src/custom_async/main.rs"
+[workspace]
+members = ["custom-async", "slow-read"]
 
 [profile.release]
 lto = true

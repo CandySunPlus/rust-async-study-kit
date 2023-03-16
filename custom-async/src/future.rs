@@ -5,6 +5,8 @@ use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
 
+use futures::task::ArcWake;
+
 use crate::executor::Parker;
 use crate::reactor::Reactor;
 
@@ -58,6 +60,8 @@ impl Task {
         Task { id, reactor, data }
     }
 }
+
+impl ArcWake for Task {}
 
 impl Future for Task {
     type Output = usize;
