@@ -2,6 +2,7 @@ use std::time::Instant;
 
 use executor::block_on;
 use future::Task;
+use futures::future::join;
 use reactor::Reactor;
 
 mod executor;
@@ -22,10 +23,7 @@ fn main() {
         println!("Got {val} at time: {:.2}", start.elapsed().as_secs_f32());
     };
 
-    let main_fut = async {
-        fut1.await;
-        fut2.await;
-    };
+    let main_fut = join(fut2, fut1);
 
     block_on(main_fut);
 
