@@ -6,7 +6,7 @@ RUST Async study kit
 An example for wrap AsyncRead
 
 ```
-cargo build --release --bin slow_read --features build-slow-read
+cargo build --release --bin slow_read
 ```
 
 ## custom_async

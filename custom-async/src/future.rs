@@ -1,9 +1,9 @@
 use std::collections::hash_map::Entry;
 use std::future::Future;
-use std::mem;
+
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
-use std::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
+use std::task::{Context, Poll, Waker};
 
 use futures::task::ArcWake;
 
@@ -29,39 +29,17 @@ pub(crate) enum TaskState {
     Finished,
 }
 
-fn mywaker_wake(s: &MyWaker) {
-    let wake_arc = unsafe { Arc::from_raw(s) };
-    wake_arc.parker.unpark();
-}
-
-const VTABLE: RawWakerVTable = unsafe {
-    RawWakerVTable::new(
-        |s| mywaker_clone(&*(s as *const _)),
-        |s| mywaker_wake(&*(s as *const _)),
-        |s| mywaker_wake(*(s as *const _)),
-        |s| drop(Arc::from_raw(s)),
-    )
-};
-
-fn mywaker_clone(s: &MyWaker) -> RawWaker {
-    let arc = unsafe { Arc::from_raw(s) };
-    // increase ref count, and don't drop when out scope
-    mem::forget(arc.clone());
-    RawWaker::new(Arc::into_raw(arc) as *const _, &VTABLE)
-}
-
-pub(crate) fn mywaker_into_waker(s: *const MyWaker) -> Waker {
-    let raw_waker = RawWaker::new(s as *const _, &VTABLE);
-    unsafe { Waker::from_raw(raw_waker) }
-}
-
 impl Task {
     pub(crate) fn new(reactor: Arc<Mutex<Box<Reactor>>>, data: u64, id: usize) -> Self {
         Task { id, reactor, data }
     }
 }
 
-impl ArcWake for Task {}
+impl ArcWake for MyWaker {
+    fn wake_by_ref(arc_self: &Arc<Self>) {
+        arc_self.parker.unpark();
+    }
+}
 
 impl Future for Task {
     type Output = usize;

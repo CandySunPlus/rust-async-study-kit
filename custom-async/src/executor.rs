@@ -3,7 +3,9 @@ use std::pin::Pin;
 use std::sync::{Arc, Condvar, Mutex};
 use std::task::{Context, Poll};
 
-use crate::future::{mywaker_into_waker, MyWaker};
+use futures::task::waker;
+
+use crate::future::MyWaker;
 
 #[derive(Default)]
 pub(crate) struct Parker(Mutex<bool>, Condvar);
@@ -33,7 +35,7 @@ pub(crate) fn block_on<F: Future>(mut future: F) -> F::Output {
     let mywaker = Arc::new(MyWaker {
         parker: parker.clone(),
     });
-    let waker = mywaker_into_waker(Arc::into_raw(mywaker));
+    let waker = waker(mywaker);
     let mut cx = Context::from_waker(&waker);
 
     // SAFETY: we shadow `future` so it can't be assessed again.
