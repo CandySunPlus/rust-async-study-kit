@@ -1,20 +1,26 @@
 RUST Async study kit
 ---
 
-## slow_read
+## slow-read
 
 An example for wrap AsyncRead
 
 ```
-cargo build --release --bin slow_read
+cargo build --release --bin slow-read
 ```
 
-## custom_async
+## custom-async
 
 An example for custom executor, future (Task) and reactor 
 
 ```
-cargo build --release --bin custom_async
+cargo build --release --bin custom-async
 ```
 
+## simple-executor
 
+An example for custom a simple executor with a sync channel
+
+```
+cargo build --release --bin simple-executor
+```
