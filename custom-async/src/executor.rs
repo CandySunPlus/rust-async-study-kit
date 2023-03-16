@@ -30,7 +30,7 @@ impl Parker {
     }
 }
 
-pub(crate) fn block_on<F: Future>(mut future: F) -> F::Output {
+pub fn block_on<F: Future>(mut future: F) -> F::Output {
     let parker = Arc::new(Parker::default());
     let mywaker = Arc::new(MyWaker {
         parker: parker.clone(),

@@ -1,6 +1,5 @@
 use std::collections::hash_map::Entry;
 use std::future::Future;
-
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll, Waker};
@@ -16,21 +15,21 @@ pub(crate) struct MyWaker {
 }
 
 #[derive(Clone)]
-pub(crate) struct Task {
+pub struct Task {
     id: usize,
     reactor: Arc<Mutex<Box<Reactor>>>,
     data: u64,
 }
 
 #[derive(Debug)]
-pub(crate) enum TaskState {
+pub enum TaskState {
     Ready,
     NotReady(Waker),
     Finished,
 }
 
 impl Task {
-    pub(crate) fn new(reactor: Arc<Mutex<Box<Reactor>>>, data: u64, id: usize) -> Self {
+    pub fn new(reactor: Arc<Mutex<Box<Reactor>>>, data: u64, id: usize) -> Self {
         Task { id, reactor, data }
     }
 }

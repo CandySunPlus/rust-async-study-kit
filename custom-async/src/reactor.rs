@@ -1,10 +1,9 @@
 use std::collections::HashMap;
-use std::mem;
 use std::sync::mpsc::{channel, Sender};
 use std::sync::{Arc, Mutex};
 use std::task::Waker;
-use std::thread;
 use std::time::Duration;
+use std::{mem, thread};
 
 use crate::future::TaskState;
 
@@ -14,14 +13,14 @@ enum Event {
     Timeout(u64, usize),
 }
 
-pub(crate) struct Reactor {
+pub struct Reactor {
     dispatcher: Sender<Event>,
     handle: Option<thread::JoinHandle<()>>,
     pub tasks: HashMap<usize, TaskState>,
 }
 
 impl Reactor {
-    pub(crate) fn new() -> Arc<Mutex<Box<Self>>> {
+    pub fn new() -> Arc<Mutex<Box<Self>>> {
         let (tx, rx) = channel::<Event>();
         let reactor = Arc::new(Mutex::new(Box::new(Reactor {
             dispatcher: tx,
@@ -82,7 +81,7 @@ impl Reactor {
         self.dispatcher.send(Event::Timeout(duration, id)).unwrap();
     }
 
-    pub(crate) fn close(&mut self) {
+    pub fn close(&mut self) {
         self.dispatcher.send(Event::Close).unwrap();
     }
 

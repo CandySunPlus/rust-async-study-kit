@@ -1,13 +1,9 @@
 use std::time::Instant;
 
-use executor::block_on;
-use future::Task;
+use custom_async::executor::block_on;
+use custom_async::future::Task;
+use custom_async::reactor::Reactor;
 use futures::future::join;
-use reactor::Reactor;
-
-mod executor;
-mod future;
-mod reactor;
 
 fn main() {
     let start = Instant::now();
