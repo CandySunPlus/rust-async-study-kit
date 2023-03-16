@@ -55,6 +55,9 @@ impl Future for TimerFuture {
 }
 
 pub struct Task {
+    // each `Waker` hold a reference to the corresponding task, so the task will shared in
+    // different threads, and the `poll` method need a mutable future, so we need use `Mutex` to
+    // provide this.
     pub future: Mutex<Option<BoxFuture<'static, ()>>>,
     // send task to executor
     pub sync_sender: SyncSender<Arc<Task>>,
