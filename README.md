@@ -27,7 +27,7 @@ cargo build --release --bin simple-executor
 
 ## simple-runtime
 
-An example for custom a mini runtime with `Poller`
+An example for custom a mini runtime with `polling` crate
 
 ```
 cargo build --release --bin simple-runtime

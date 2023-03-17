@@ -38,10 +38,9 @@ impl Task {
         self.state.store(RUNNING, Ordering::SeqCst);
         let cx = &mut Context::from_waker(&waker);
         let poll = self.future.try_lock().unwrap().as_mut().poll(cx);
-        if poll.is_pending() {
-            if self.state.fetch_and(!RUNNING, Ordering::SeqCst) == WOKEN | RUNNING {
-                QUEUE.send(self).unwrap();
-            }
+        if poll.is_pending() && self.state.fetch_and(!RUNNING, Ordering::SeqCst) == WOKEN | RUNNING
+        {
+            QUEUE.send(self).unwrap();
         }
     }
 }
