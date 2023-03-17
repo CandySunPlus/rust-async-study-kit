@@ -14,12 +14,12 @@ fn main() {
         println!("executor end: {:.2}", start.elapsed().as_secs_f32());
     });
 
-    spawner.spawn(best_executor::spawn(async {
+    best_executor::spawn(async {
         let start = Instant::now();
         println!("best executor start: {:.2}", start.elapsed().as_secs_f32());
         TimerFuture::new(Duration::from_secs(5)).await;
         println!("best executor end: {:.2}", start.elapsed().as_secs_f32());
-    }));
+    });
 
     // if we don't drop the spawner manually, the executor's receiver will keep blocking
     drop(spawner);
