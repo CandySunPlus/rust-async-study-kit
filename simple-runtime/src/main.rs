@@ -18,6 +18,7 @@ async fn serve() {
                     match stream.read(&mut buf).await {
                         Ok(n) => {
                             if n == 0 || stream.write_all(&buf[..n]).await.is_err() {
+                                println!("client disconnected");
                                 return;
                             }
                         }
