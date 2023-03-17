@@ -11,7 +11,7 @@ async fn serve() {
     let mut listener = TcpListener::bind("127.0.0.1:30000").unwrap();
     while let Some(ret) = listener.next().await {
         if let Ok((mut stream, addr)) = ret {
-            println!("accept a new connection form {addr} successfully");
+            println!("accept a new connection from {addr} successfully");
             let f = async move {
                 let mut buf = [0; 4096];
                 loop {
