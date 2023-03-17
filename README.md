@@ -24,3 +24,11 @@ An example for custom a simple executor with a sync channel
 ```
 cargo build --release --bin simple-executor
 ```
+
+## simple-runtime
+
+An example for custom a mini runtime with `Poller`
+
+```
+cargo build --release --bin simple-runtime
+```
