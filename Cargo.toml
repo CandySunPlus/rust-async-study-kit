@@ -1,5 +1,5 @@
 [workspace]
-members = ["custom-async", "slow-read", "simple-executor"]
+members = ["custom-async", "slow-read", "simple-executor", "simple-runtime"]
 
 [profile.release]
 lto = true
