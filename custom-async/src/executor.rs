@@ -30,6 +30,19 @@ impl Parker {
     }
 }
 
+/// Block the current thread until the provided `Future` has resolved.
+///
+/// This function will drive the provided `Future` to completion, blocking the
+/// current thread until the future completes. The result of the future is then
+/// returned.
+///
+/// Note that this function should only be called from the context of a single-threaded
+/// executor.
+///
+/// # Panics
+///
+/// This function will panic if the executor is not currently being run on a single-threaded
+/// executor.
 pub fn block_on<F: Future>(mut future: F) -> F::Output {
     let parker = Arc::new(Parker::default());
     let mywaker = Arc::new(MyWaker {
